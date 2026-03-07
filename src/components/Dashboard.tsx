@@ -7,18 +7,19 @@ import { SchemesSupport } from "./SchemesSupport";
 import { Information } from "./Information";
 import { Marketplace } from "./Marketplace";
 import { PastCrops } from "./PastCrops";
+import { Sidebar } from "./ui/dashboard-with-collapsible-sidebar";
 
 interface DashboardProps {
   farmer: any;
 }
 
 export function Dashboard({ farmer }: DashboardProps) {
-  const [activeTab, setActiveTab] = useState("overview");
+  const [activeTab, setActiveTab] = useState("Overview");
   const [showChatBot, setShowChatBot] = useState(false);
   const [selectedLanguage, setSelectedLanguage] = useState("English");
 
   const languages = [
-    "English", "हिंदी", "বাংলা", "தமிழ்", "తెలుగు", "ಕನ್ನಡ", 
+    "English", "हिंदी", "বাংলা", "தமிழ்", "తెలుగు", "ಕನ್ನಡ",
     "മലയാളം", "ગુજરાતી", "ਪੰਜਾਬੀ", "मराठी", "ଓଡ଼ିଆ"
   ];
 
@@ -38,28 +39,28 @@ export function Dashboard({ farmer }: DashboardProps) {
       title: "Get Crop Recommendations",
       description: "AI-powered crop suggestions for your farm",
       icon: "🌱",
-      action: () => setActiveTab("recommendations"),
+      action: () => setActiveTab("Crop Recommendations"),
       color: "bg-green-600 hover:bg-green-700"
     },
     {
       title: "Check Weather Alerts",
       description: "Real-time weather updates and farming alerts",
       icon: "🌤️",
-      action: () => setActiveTab("insights"),
+      action: () => setActiveTab("Farm Insights"),
       color: "bg-yellow-600 hover:bg-yellow-700"
     },
     {
       title: "Browse Marketplace",
       description: "Buy supplies or sell your crops",
       icon: "🛒",
-      action: () => setActiveTab("marketplace"),
+      action: () => setActiveTab("Marketplace"),
       color: "bg-blue-600 hover:bg-blue-700"
     },
     {
       title: "Track Past Harvests",
       description: "Analyze your farming performance",
       icon: "📊",
-      action: () => setActiveTab("pastcrops"),
+      action: () => setActiveTab("Past Crops"),
       color: "bg-purple-600 hover:bg-purple-700"
     }
   ];
@@ -88,168 +89,121 @@ export function Dashboard({ farmer }: DashboardProps) {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 via-amber-50 to-green-50">
-      <div className="flex">
-        {/* Sidebar */}
-        <div className="w-64 bg-white/90 backdrop-blur-sm shadow-lg border-r border-green-200 min-h-screen">
-          <div className="p-6">
-            <div className="flex items-center gap-3 mb-6">
-              <span className="text-2xl">👨‍🌾</span>
-              <div>
-                <h2 className="font-bold text-green-700">{farmer.name}</h2>
-                <p className="text-sm text-green-600">{farmer.location}</p>
+    <div className="flex h-screen w-full overflow-hidden bg-gradient-to-br from-green-50 to-green-100">
+      <Sidebar selected={activeTab} setSelected={setActiveTab} />
+
+      {/* Main Content */}
+      <div className="flex-1 p-6 h-full overflow-y-auto">
+        {activeTab === "Overview" && (
+          <div className="space-y-6">
+            {/* Welcome Section */}
+            <div className="bg-white/90 backdrop-blur-sm rounded-xl p-6 shadow-sm border border-green-200">
+              <h1 className="text-3xl font-bold text-green-700 mb-2">
+                Welcome back, {farmer.name.replace(/\b\w/g, (l: string) => l.toUpperCase())}! 🌾
+              </h1>
+              <p className="text-gray-600">
+                Your farm dashboard is ready with personalized insights and recommendations
+              </p>
+            </div>
+
+            {/* Farm Stats */}
+            <div className="grid md:grid-cols-4 gap-6">
+              <div className="bg-white/90 backdrop-blur-sm rounded-xl p-6 shadow-sm border border-green-200 text-center">
+                <div className="text-3xl mb-2">🏞️</div>
+                <h3 className="text-lg font-semibold text-gray-800">Farm Size</h3>
+                <div className="text-2xl font-bold text-green-600">{farmer.farmSize} acres</div>
+              </div>
+
+              <div className="bg-white/90 backdrop-blur-sm rounded-xl p-6 shadow-sm border border-green-200 text-center">
+                <div className="text-3xl mb-2">🌱</div>
+                <h3 className="text-lg font-semibold text-gray-800">Soil Type</h3>
+                <div className="text-lg font-medium text-gray-700 capitalize">{farmer.soilType}</div>
+              </div>
+
+              <div className="bg-white/90 backdrop-blur-sm rounded-xl p-6 shadow-sm border border-green-200 text-center">
+                <div className="text-3xl mb-2">🧪</div>
+                <h3 className="text-lg font-semibold text-gray-800">Soil pH</h3>
+                <div className="text-2xl font-bold text-blue-600">{farmer.soilPh}</div>
+              </div>
+
+              <div className="bg-white/90 backdrop-blur-sm rounded-xl p-6 shadow-sm border border-green-200 text-center">
+                <div className="text-3xl mb-2">🌧️</div>
+                <h3 className="text-lg font-semibold text-gray-800">Rainfall</h3>
+                <div className="text-lg font-medium text-gray-700">{farmer.rainfall}mm/year</div>
               </div>
             </div>
 
-            {/* Language Selector */}
-            <div className="mb-6">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                🌐 Language
-              </label>
-              <select
-                value={selectedLanguage}
-                onChange={(e) => setSelectedLanguage(e.target.value)}
-                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
-              >
-                {languages.map((lang) => (
-                  <option key={lang} value={lang}>{lang}</option>
+            {/* Quick Actions */}
+            <div className="bg-white/90 backdrop-blur-sm rounded-xl p-6 shadow-sm border border-green-200">
+              <h2 className="text-xl font-semibold text-gray-800 mb-4">⚡ Quick Actions</h2>
+              <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
+                {quickActions.map((action, index) => (
+                  <button
+                    key={index}
+                    onClick={action.action}
+                    className={`p-4 rounded-lg text-white hover:scale-105 transition transform shadow-md ${action.color}`}
+                  >
+                    <div className="text-2xl mb-2">{action.icon}</div>
+                    <h3 className="font-semibold mb-1">{action.title}</h3>
+                    <p className="text-sm opacity-90">{action.description}</p>
+                  </button>
                 ))}
-              </select>
-              <p className="text-xs text-gray-500 mt-1">Translation coming soon</p>
+              </div>
             </div>
 
-            <nav className="space-y-2">
-              {tabs.map((tab) => (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id)}
-                  className={`w-full text-left px-4 py-3 rounded-lg transition-colors ${
-                    activeTab === tab.id
-                      ? "bg-green-100 text-green-700 font-medium"
-                      : "text-gray-600 hover:bg-gray-100"
-                  }`}
-                >
-                  <span className="mr-3">{tab.icon}</span>
-                  {tab.label.replace(/^[^\s]+ /, "")}
-                </button>
-              ))}
-            </nav>
+            {/* Expert Tips */}
+            <div className="bg-white/90 backdrop-blur-sm rounded-xl p-6 shadow-sm border border-green-200">
+              <h2 className="text-xl font-semibold text-gray-800 mb-4">💡 Expert Tips of the Week</h2>
+              <div className="grid md:grid-cols-2 gap-6">
+                {expertTips.map((tip, index) => (
+                  <div key={index} className="bg-gradient-to-r from-green-50 to-blue-50 rounded-lg p-4 border border-green-200">
+                    <div className="flex items-center gap-3 mb-3">
+                      <span className="text-2xl">{tip.icon}</span>
+                      <h4 className="font-semibold text-gray-800">{tip.title}</h4>
+                    </div>
+                    <p className="text-sm text-gray-700">{tip.tip}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Recent Activity */}
+            <div className="bg-white/90 backdrop-blur-sm rounded-xl p-6 shadow-sm border border-green-200">
+              <h2 className="text-xl font-semibold text-gray-800 mb-4">📈 Recent Activity</h2>
+              <div className="space-y-3">
+                <div className="flex items-center gap-3 p-3 bg-green-50 rounded-lg">
+                  <span className="text-lg">🌱</span>
+                  <div>
+                    <div className="font-medium text-gray-800">Profile Setup Complete</div>
+                    <div className="text-sm text-gray-600">Your farm profile is ready for personalized recommendations</div>
+                  </div>
+                </div>
+                <div className="flex items-center gap-3 p-3 bg-blue-50 rounded-lg">
+                  <span className="text-lg">🌤️</span>
+                  <div>
+                    <div className="font-medium text-gray-800">Weather Data Available</div>
+                    <div className="text-sm text-gray-600">Check the Farm Insights tab for current weather conditions</div>
+                  </div>
+                </div>
+                <div className="flex items-center gap-3 p-3 bg-yellow-50 rounded-lg">
+                  <span className="text-lg">🎯</span>
+                  <div>
+                    <div className="font-medium text-gray-800">Ready for Crop Recommendations</div>
+                    <div className="text-sm text-gray-600">Generate AI-powered crop suggestions based on your farm data</div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
-        </div>
+        )}
 
-        {/* Main Content */}
-        <div className="flex-1 p-6">
-          {activeTab === "overview" && (
-            <div className="space-y-6">
-              {/* Welcome Section */}
-              <div className="bg-white/90 backdrop-blur-sm rounded-xl p-6 shadow-sm border border-green-200">
-                <h1 className="text-3xl font-bold text-green-700 mb-2">
-                  Welcome back, {farmer.name}! 🌾
-                </h1>
-                <p className="text-gray-600">
-                  Your farm dashboard is ready with personalized insights and recommendations
-                </p>
-              </div>
-
-              {/* Farm Stats */}
-              <div className="grid md:grid-cols-4 gap-6">
-                <div className="bg-white/90 backdrop-blur-sm rounded-xl p-6 shadow-sm border border-green-200 text-center">
-                  <div className="text-3xl mb-2">🏞️</div>
-                  <h3 className="text-lg font-semibold text-gray-800">Farm Size</h3>
-                  <div className="text-2xl font-bold text-green-600">{farmer.farmSize} acres</div>
-                </div>
-                
-                <div className="bg-white/90 backdrop-blur-sm rounded-xl p-6 shadow-sm border border-green-200 text-center">
-                  <div className="text-3xl mb-2">🌱</div>
-                  <h3 className="text-lg font-semibold text-gray-800">Soil Type</h3>
-                  <div className="text-lg font-medium text-gray-700 capitalize">{farmer.soilType}</div>
-                </div>
-                
-                <div className="bg-white/90 backdrop-blur-sm rounded-xl p-6 shadow-sm border border-green-200 text-center">
-                  <div className="text-3xl mb-2">🧪</div>
-                  <h3 className="text-lg font-semibold text-gray-800">Soil pH</h3>
-                  <div className="text-2xl font-bold text-blue-600">{farmer.soilPh}</div>
-                </div>
-                
-                <div className="bg-white/90 backdrop-blur-sm rounded-xl p-6 shadow-sm border border-green-200 text-center">
-                  <div className="text-3xl mb-2">🌧️</div>
-                  <h3 className="text-lg font-semibold text-gray-800">Rainfall</h3>
-                  <div className="text-lg font-medium text-gray-700">{farmer.rainfall}mm/year</div>
-                </div>
-              </div>
-
-              {/* Quick Actions */}
-              <div className="bg-white/90 backdrop-blur-sm rounded-xl p-6 shadow-sm border border-green-200">
-                <h2 className="text-xl font-semibold text-gray-800 mb-4">⚡ Quick Actions</h2>
-                <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
-                  {quickActions.map((action, index) => (
-                    <button
-                      key={index}
-                      onClick={action.action}
-                      className={`p-4 rounded-lg text-white transition-colors ${action.color}`}
-                    >
-                      <div className="text-2xl mb-2">{action.icon}</div>
-                      <h3 className="font-semibold mb-1">{action.title}</h3>
-                      <p className="text-sm opacity-90">{action.description}</p>
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Expert Tips */}
-              <div className="bg-white/90 backdrop-blur-sm rounded-xl p-6 shadow-sm border border-green-200">
-                <h2 className="text-xl font-semibold text-gray-800 mb-4">💡 Expert Tips of the Week</h2>
-                <div className="grid md:grid-cols-2 gap-6">
-                  {expertTips.map((tip, index) => (
-                    <div key={index} className="bg-gradient-to-r from-green-50 to-blue-50 rounded-lg p-4 border border-green-200">
-                      <div className="flex items-center gap-3 mb-3">
-                        <span className="text-2xl">{tip.icon}</span>
-                        <h4 className="font-semibold text-gray-800">{tip.title}</h4>
-                      </div>
-                      <p className="text-sm text-gray-700">{tip.tip}</p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Recent Activity */}
-              <div className="bg-white/90 backdrop-blur-sm rounded-xl p-6 shadow-sm border border-green-200">
-                <h2 className="text-xl font-semibold text-gray-800 mb-4">📈 Recent Activity</h2>
-                <div className="space-y-3">
-                  <div className="flex items-center gap-3 p-3 bg-green-50 rounded-lg">
-                    <span className="text-lg">🌱</span>
-                    <div>
-                      <div className="font-medium text-gray-800">Profile Setup Complete</div>
-                      <div className="text-sm text-gray-600">Your farm profile is ready for personalized recommendations</div>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-3 p-3 bg-blue-50 rounded-lg">
-                    <span className="text-lg">🌤️</span>
-                    <div>
-                      <div className="font-medium text-gray-800">Weather Data Available</div>
-                      <div className="text-sm text-gray-600">Check the Farm Insights tab for current weather conditions</div>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-3 p-3 bg-yellow-50 rounded-lg">
-                    <span className="text-lg">🎯</span>
-                    <div>
-                      <div className="font-medium text-gray-800">Ready for Crop Recommendations</div>
-                      <div className="text-sm text-gray-600">Generate AI-powered crop suggestions based on your farm data</div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {activeTab === "insights" && <FarmInsights farmer={farmer} />}
-          {activeTab === "recommendations" && <CropRecommendations />}
-          {activeTab === "marketplace" && <Marketplace />}
-          {activeTab === "pastcrops" && <PastCrops />}
-          {activeTab === "learn" && <LearnAndGrow />}
-          {activeTab === "schemes" && <SchemesSupport />}
-          {activeTab === "information" && <Information />}
-        </div>
+        {activeTab === "Farm Insights" && <FarmInsights farmer={farmer} />}
+        {activeTab === "Crop Recommendations" && <CropRecommendations />}
+        {activeTab === "Marketplace" && <Marketplace />}
+        {activeTab === "Past Crops" && <PastCrops />}
+        {activeTab === "Learn & Grow" && <LearnAndGrow />}
+        {activeTab === "Schemes & Support" && <SchemesSupport />}
+        {activeTab === "Settings" && <Information />}
       </div>
 
       {/* Floating Chat Button */}

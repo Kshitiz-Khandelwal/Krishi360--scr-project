@@ -8,7 +8,7 @@ import { FarmerSetup } from "./components/FarmerSetup";
 
 export default function App() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-amber-50 to-green-50">
+    <div className="min-h-screen bg-gradient-to-br from-green-50 to-green-100">
       <header className="sticky top-0 z-10 bg-white/90 backdrop-blur-sm border-b border-green-200 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 h-16 flex justify-between items-center">
           <div className="flex items-center gap-3">
@@ -19,7 +19,7 @@ export default function App() {
             </div>
           </div>
           <Authenticated>
-            <SignOutButton />
+            <HeaderActions />
           </Authenticated>
         </div>
       </header>
@@ -32,15 +32,33 @@ export default function App() {
           <UnauthenticatedContent />
         </Unauthenticated>
       </main>
-      
+
       <Toaster />
+    </div>
+  );
+}
+
+function HeaderActions() {
+  const farmer = useQuery(api.farmers.getCurrentFarmer);
+
+  return (
+    <div className="flex items-center gap-4">
+      {farmer && (
+        <div className="flex items-center gap-2 px-3 py-1.5 bg-green-50 rounded-full border border-green-100 shadow-sm">
+          <span className="text-lg leading-none">👤</span>
+          <span className="text-sm font-medium text-green-800">
+            {farmer.name.split(' ')[0]}
+          </span>
+        </div>
+      )}
+      <SignOutButton />
     </div>
   );
 }
 
 function AuthenticatedContent() {
   const farmer = useQuery(api.farmers.getCurrentFarmer);
-  
+
   if (farmer === undefined) {
     return (
       <div className="flex justify-center items-center py-20">

@@ -2,12 +2,8 @@
 import React, { useState, useEffect } from "react";
 import {
   Home,
-  DollarSign,
-  Monitor,
-  ShoppingCart,
-  Tag,
   BarChart3,
-  Users,
+  ShoppingCart,
   ChevronDown,
   ChevronsRight,
   Moon,
@@ -17,9 +13,13 @@ import {
   Package,
   Bell,
   Settings,
-  HelpCircle,
   User,
+  Leaf,
+  BookOpen,
+  History,
+  Landmark,
 } from "lucide-react";
+import logo from "../../assets/logo.png";
 
 export const Example = () => {
   const [isDark, setIsDark] = useState(false);
@@ -42,86 +42,76 @@ export const Example = () => {
   );
 };
 
-const Sidebar = () => {
+export const Sidebar = ({ selected, setSelected }: { selected: string, setSelected: (s: string) => void }) => {
   const [open, setOpen] = useState(true);
-  const [selected, setSelected] = useState("Dashboard");
 
   return (
     <nav
       className={`relative h-full shrink-0 border-r transition-all duration-300 ease-in-out overflow-y-auto ${open ? 'w-64' : 'w-16'
-        } border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-2 shadow-sm`}
+        } border-gray-200 bg-white p-2 shadow-sm`}
     >
       <TitleSection open={open} />
 
       <div className="space-y-1 mb-8">
         <Option
           Icon={Home}
-          title="Dashboard"
-          selected={selected}
-          setSelected={setSelected}
-          open={open}
-        />
-        <Option
-          Icon={DollarSign}
-          title="Sales"
-          selected={selected}
-          setSelected={setSelected}
-          open={open}
-          notifs={3}
-        />
-        <Option
-          Icon={Monitor}
-          title="View Site"
-          selected={selected}
-          setSelected={setSelected}
-          open={open}
-        />
-        <Option
-          Icon={ShoppingCart}
-          title="Products"
-          selected={selected}
-          setSelected={setSelected}
-          open={open}
-        />
-        <Option
-          Icon={Tag}
-          title="Tags"
+          title="Overview"
           selected={selected}
           setSelected={setSelected}
           open={open}
         />
         <Option
           Icon={BarChart3}
-          title="Analytics"
+          title="Farm Insights"
           selected={selected}
           setSelected={setSelected}
           open={open}
         />
         <Option
-          Icon={Users}
-          title="Members"
+          Icon={Leaf}
+          title="Crop Recommendations"
           selected={selected}
           setSelected={setSelected}
           open={open}
-          notifs={12}
+        />
+        <Option
+          Icon={ShoppingCart}
+          title="Marketplace"
+          selected={selected}
+          setSelected={setSelected}
+          open={open}
+        />
+        <Option
+          Icon={BookOpen}
+          title="Learn & Grow"
+          selected={selected}
+          setSelected={setSelected}
+          open={open}
         />
       </div>
 
       {open && (
         <div className="border-t border-gray-200 dark:border-gray-800 pt-4 space-y-1">
           <div className="px-3 py-2 text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
-            Account
+            More
           </div>
           <Option
-            Icon={Settings}
-            title="Settings"
+            Icon={History}
+            title="Past Crops"
             selected={selected}
             setSelected={setSelected}
             open={open}
           />
           <Option
-            Icon={HelpCircle}
-            title="Help & Support"
+            Icon={Landmark}
+            title="Schemes & Support"
+            selected={selected}
+            setSelected={setSelected}
+            open={open}
+          />
+          <Option
+            Icon={Settings}
+            title="Settings"
             selected={selected}
             setSelected={setSelected}
             open={open}
@@ -140,18 +130,18 @@ const Option = ({ Icon, title, selected, setSelected, open, notifs }: { Icon: an
   return (
     <button
       onClick={() => setSelected(title)}
-      className={`relative flex h-11 w-full items-center rounded-md transition-all duration-200 ${isSelected
-          ? "bg-blue-50 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300 shadow-sm border-l-2 border-blue-500"
-          : "text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-gray-200"
+      className={`relative flex h-11 w-full items-center rounded-lg transition-all duration-200 ${isSelected
+        ? "bg-green-100 text-green-700 font-medium shadow-sm"
+        : "text-gray-600 hover:bg-gray-100 hover:text-green-600"
         }`}
     >
       <div className="grid h-full w-12 place-content-center">
-        <Icon className="h-4 w-4" />
+        <Icon className="h-5 w-5" />
       </div>
 
       {open && (
         <span
-          className={`text-sm font-medium transition-opacity duration-200 ${open ? 'opacity-100' : 'opacity-0'
+          className={`text-sm transition-opacity duration-200 ${open ? 'opacity-100' : 'opacity-0'
             }`}
         >
           {title}
@@ -169,28 +159,19 @@ const Option = ({ Icon, title, selected, setSelected, open, notifs }: { Icon: an
 
 const TitleSection = ({ open }: { open: boolean }) => {
   return (
-    <div className="mb-6 border-b border-gray-200 dark:border-gray-800 pb-4">
-      <div className="flex cursor-pointer items-center justify-between rounded-md p-2 transition-colors hover:bg-gray-50 dark:hover:bg-gray-800">
+    <div className="mb-6 border-b border-gray-200 pb-4">
+      <div className="flex cursor-pointer items-center justify-between rounded-md p-2 transition-colors hover:bg-gray-50">
         <div className="flex items-center gap-3">
           <Logo />
           {open && (
             <div className={`transition-opacity duration-200 ${open ? 'opacity-100' : 'opacity-0'}`}>
-              <div className="flex items-center gap-2">
-                <div>
-                  <span className="block text-sm font-semibold text-gray-900 dark:text-gray-100">
-                    TomIsLoading
-                  </span>
-                  <span className="block text-xs text-gray-500 dark:text-gray-400">
-                    Pro Plan
-                  </span>
-                </div>
+              <div>
+                <p className="font-semibold text-green-700 whitespace-nowrap">Krishi360</p>
+                <p className="text-xs text-gray-500 whitespace-nowrap">Smart Farming</p>
               </div>
             </div>
           )}
         </div>
-        {open && (
-          <ChevronDown className="h-4 w-4 text-gray-400 dark:text-gray-500" />
-        )}
       </div>
     </div>
   );
@@ -198,22 +179,8 @@ const TitleSection = ({ open }: { open: boolean }) => {
 
 const Logo = () => {
   return (
-    <div className="grid size-10 shrink-0 place-content-center rounded-lg bg-gradient-to-br from-blue-500 to-blue-600 shadow-sm">
-      <svg
-        width="20"
-        height="auto"
-        viewBox="0 0 50 39"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-        className="fill-white"
-      >
-        <path
-          d="M16.4992 2H37.5808L22.0816 24.9729H1L16.4992 2Z"
-        />
-        <path
-          d="M17.4224 27.102L11.4192 36H33.5008L49 13.0271H32.7024L23.2064 27.102H17.4224Z"
-        />
-      </svg>
+    <div className="flex shrink-0 items-center justify-center">
+      <img src={logo} alt="Krishi360 Logo" className="h-9 w-auto object-contain" />
     </div>
   );
 };
@@ -346,16 +313,16 @@ const ExampleContent = ({ isDark, setIsDark }: { isDark: boolean, setIsDark: (is
               ].map((activity, i) => (
                 <div key={i} className="flex items-center space-x-4 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors cursor-pointer">
                   <div className={`p-2 rounded-lg ${activity.color === 'green' ? 'bg-green-50 dark:bg-green-900/20' :
-                      activity.color === 'blue' ? 'bg-blue-50 dark:bg-blue-900/20' :
-                        activity.color === 'purple' ? 'bg-purple-50 dark:bg-purple-900/20' :
-                          activity.color === 'orange' ? 'bg-orange-50 dark:bg-orange-900/20' :
-                            'bg-red-50 dark:bg-red-900/20'
+                    activity.color === 'blue' ? 'bg-blue-50 dark:bg-blue-900/20' :
+                      activity.color === 'purple' ? 'bg-purple-50 dark:bg-purple-900/20' :
+                        activity.color === 'orange' ? 'bg-orange-50 dark:bg-orange-900/20' :
+                          'bg-red-50 dark:bg-red-900/20'
                     }`}>
                     <activity.icon className={`h-4 w-4 ${activity.color === 'green' ? 'text-green-600 dark:text-green-400' :
-                        activity.color === 'blue' ? 'text-blue-600 dark:text-blue-400' :
-                          activity.color === 'purple' ? 'text-purple-600 dark:text-purple-400' :
-                            activity.color === 'orange' ? 'text-orange-600 dark:text-orange-400' :
-                              'text-red-600 dark:text-red-400'
+                      activity.color === 'blue' ? 'text-blue-600 dark:text-blue-400' :
+                        activity.color === 'purple' ? 'text-purple-600 dark:text-purple-400' :
+                          activity.color === 'orange' ? 'text-orange-600 dark:text-orange-400' :
+                            'text-red-600 dark:text-red-400'
                       }`} />
                   </div>
                   <div className="flex-1 min-w-0">
