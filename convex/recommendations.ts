@@ -64,9 +64,9 @@ export const generateRecommendations = mutation({
       });
     }
 
-    // Sort by CSI and take top 5
+    // Sort by CSI and take top 6
     recommendations.sort((a, b) => b.csi - a.csi);
-    const topRecommendations = recommendations.slice(0, 5);
+    const topRecommendations = recommendations.slice(0, 6);
 
     // Save recommendations
     await ctx.db.insert("recommendations", {

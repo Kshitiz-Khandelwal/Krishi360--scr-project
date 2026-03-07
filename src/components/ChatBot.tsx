@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { useMutation, useQuery, useAction } from "convex/react";
+import { useMutation, useQuery } from "convex/react";
 import { api } from "../../convex/_generated/api";
 
 interface ChatBotProps {
@@ -11,8 +11,9 @@ export function ChatBot({ onClose }: ChatBotProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const askGrokBot = useAction(api.chatbot.askGrokBot);
+  const saveChatMessage = useMutation(api.chatbot.saveChatMessage);
   const chatHistory = useQuery(api.chatbot.getChatHistory);
+  const farmer = useQuery(api.farmers.getCurrentFarmer);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -28,13 +29,81 @@ export function ChatBot({ onClose }: ChatBotProps) {
 
     setIsLoading(true);
     setError(null);
-    
+
     try {
-      await askGrokBot({ question: message });
+      // Structure the prompt exactly as requested for TinyLlama
+      const systemPrompt = `You are "Krishi Sahayak", an AI assistant designed to help farmers.
+Your job is to explain agricultural data in a simple and practical way.
+The system already calculates crop recommendations and plant health metrics.
+You MUST NOT change or recalculate these values.
+You only explain what the results mean and give practical suggestions.
+
+Rules:
+1. Never change the crop recommendations provided.
+2. Never invent new crops.
+3. Explain the meaning of Leaf Area Index (LAI) and crop health clearly.
+4. Give practical advice a farmer can follow.
+5. Use simple language that farmers can understand.
+6. Keep answers short and structured.
+
+If data is missing, say that more information is required instead of guessing.
+
+Output format:
+Crop Health Analysis
+Leaf Area Index: [Explanation]
+Crop Health: [Explanation]
+Possible Causes: [List]
+Recommended Actions: [List]
+
+Answer in less than 150 words.`;
+
+      // Mock some data, but use real farmer data if available
+      const agrData = `Agricultural Data:
+Crop: Wheat (Estimated)
+Leaf Area Index: 3.5
+Health Score: 78
+Soil: ${farmer ? farmer.soilType : "Unknown"}
+Rainfall: ${farmer ? farmer.rainfall + " mm" : "Unknown"}
+Growth Stage: Tillering
+
+Context/Question: ${message}
+
+Explain the crop health.`;
+
+      const fullPrompt = `${systemPrompt}\n\n${agrData}`;
+
+      const response = await fetch("http://localhost:11434/api/generate", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          model: "tinyllama",
+          prompt: fullPrompt,
+          stream: false,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Ollama error: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      const answer = data.response;
+
+      // Save the response persistent via Convex
+      if (farmer) {
+        await saveChatMessage({
+          farmerId: farmer._id,
+          question: message,
+          answer: answer,
+        });
+      }
+
       setMessage("");
     } catch (error) {
-      console.error("Failed to send message:", error);
-      setError("Failed to send message. Please try again.");
+      console.error("Failed to fetch from local Ollama:", error);
+      setError("Failed to connect to Krishi Sahayak (TinyLlama). Ensure 'ollama serve' is running with CORS enabled (OLLAMA_ORIGINS=\"*\").");
     } finally {
       setIsLoading(false);
     }
@@ -58,7 +127,7 @@ export function ChatBot({ onClose }: ChatBotProps) {
         <div className="flex items-center gap-2">
           <span className="text-xl">🤖</span>
           <div>
-            <h3 className="font-semibold text-gray-800">Krishi Assistant</h3>
+            <h3 className="font-semibold text-gray-800">Krishi Sahayak</h3>
             <p className="text-xs text-gray-600">AI-powered farming help</p>
           </div>
         </div>
@@ -91,7 +160,7 @@ export function ChatBot({ onClose }: ChatBotProps) {
                 <p className="text-sm">{chat.question}</p>
               </div>
             </div>
-            
+
             {/* Bot Response */}
             <div className="flex items-start gap-2">
               <span className="text-lg">🤖</span>
@@ -125,7 +194,7 @@ export function ChatBot({ onClose }: ChatBotProps) {
             </div>
           </div>
         )}
-        
+
         <div ref={messagesEndRef} />
       </div>
 
