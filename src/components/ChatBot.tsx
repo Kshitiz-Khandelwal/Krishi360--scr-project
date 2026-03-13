@@ -8,12 +8,15 @@ interface ChatBotProps {
 
 export function ChatBot({ onClose }: ChatBotProps) {
   const [message, setMessage] = useState("");
+  const [sessionMessages, setSessionMessages] = useState<{question: string, answer: string}[]>([]);
+  const [optimisticUserMessage, setOptimisticUserMessage] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const saveChatMessage = useMutation(api.chatbot.saveChatMessage);
   const chatHistory = useQuery(api.chatbot.getChatHistory);
   const farmer = useQuery(api.farmers.getCurrentFarmer);
+  const recommendations = useQuery(api.recommendations.getLatestRecommendations);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -21,56 +24,41 @@ export function ChatBot({ onClose }: ChatBotProps) {
 
   useEffect(() => {
     scrollToBottom();
-  }, [chatHistory]);
+  }, [chatHistory, sessionMessages]);
 
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!message.trim()) return;
 
+    const currentMessage = message.trim();
+    setOptimisticUserMessage(currentMessage);
+    setMessage(""); // Instantly clear input for better UX
     setIsLoading(true);
     setError(null);
 
     try {
-      // Structure the prompt exactly as requested for TinyLlama
-      const systemPrompt = `You are "Krishi Sahayak", an AI assistant designed to help farmers.
-Your job is to explain agricultural data in a simple and practical way.
-The system already calculates crop recommendations and plant health metrics.
-You MUST NOT change or recalculate these values.
-You only explain what the results mean and give practical suggestions.
+      // Build context from REAL farmer profile data
+      let farmerContext = "No farmer profile available.";
+      if (farmer) {
+        farmerContext = `Farmer: ${farmer.name}, Location: ${farmer.location}, Farm: ${farmer.farmSize} acres, Soil: ${farmer.soilType} (pH ${farmer.soilPh}), Rainfall: ${farmer.rainfall}mm/yr, Temp: ${farmer.temperature.min}-${farmer.temperature.max}°C`;
+        if (farmer.crops?.length) {
+          farmerContext += `, Growing: ${farmer.crops.join(", ")}`;
+        }
+      }
 
-Rules:
-1. Never change the crop recommendations provided.
-2. Never invent new crops.
-3. Explain the meaning of Leaf Area Index (LAI) and crop health clearly.
-4. Give practical advice a farmer can follow.
-5. Use simple language that farmers can understand.
-6. Keep answers short and structured.
+      let cropContext = "";
+      if (recommendations?.crops?.length) {
+        const topCrops = recommendations.crops.slice(0, 3).map(r =>
+          `${r.crop?.name} (CSI:${r.csi}, ₹${r.crop?.marketPrice}/q)`
+        ).join(", ");
+        cropContext = `\nRecommended crops: ${topCrops}`;
+      }
 
-If data is missing, say that more information is required instead of guessing.
+      const fullPrompt = `You are Krishi Sahayak. Answer in 1 to 2 short sentences ONLY. Maximum 40 words. Be direct.
 
-Output format:
-Crop Health Analysis
-Leaf Area Index: [Explanation]
-Crop Health: [Explanation]
-Possible Causes: [List]
-Recommended Actions: [List]
+${farmerContext}${cropContext}
 
-Answer in less than 150 words.`;
-
-      // Mock some data, but use real farmer data if available
-      const agrData = `Agricultural Data:
-Crop: Wheat (Estimated)
-Leaf Area Index: 3.5
-Health Score: 78
-Soil: ${farmer ? farmer.soilType : "Unknown"}
-Rainfall: ${farmer ? farmer.rainfall + " mm" : "Unknown"}
-Growth Stage: Tillering
-
-Context/Question: ${message}
-
-Explain the crop health.`;
-
-      const fullPrompt = `${systemPrompt}\n\n${agrData}`;
+Question: ${currentMessage}`;
 
       const response = await fetch("http://localhost:11434/api/generate", {
         method: "POST",
@@ -91,21 +79,29 @@ Explain the crop health.`;
       const data = await response.json();
       const answer = data.response;
 
+      // Add to local session so it immediately displays regardless of DB
+      setSessionMessages(prev => [...prev, { question: currentMessage, answer }]);
+
       // Save the response persistent via Convex
       if (farmer) {
-        await saveChatMessage({
-          farmerId: farmer._id,
-          question: message,
-          answer: answer,
-        });
+        try {
+          await saveChatMessage({
+            farmerId: farmer._id,
+            question: currentMessage,
+            answer: answer,
+          });
+        } catch (dbError) {
+          console.error("Failed to save message to Convex:", dbError);
+          // Non-fatal, we still show the message locally
+        }
       }
 
-      setMessage("");
-    } catch (error) {
+    } catch (error: any) {
       console.error("Failed to fetch from local Ollama:", error);
-      setError("Failed to connect to Krishi Sahayak (TinyLlama). Ensure 'ollama serve' is running with CORS enabled (OLLAMA_ORIGINS=\"*\").");
+      setError(`Error connecting to AI: ${error.message || "Ensure 'ollama serve' is running and 'tinyllama' is pulled."}`);
     } finally {
       setIsLoading(false);
+      setOptimisticUserMessage(null);
     }
   };
 
@@ -151,17 +147,14 @@ Explain the crop health.`;
           </div>
         </div>
 
-        {/* Chat History */}
+        {/* Chat History from Server */}
         {chatHistory && chatHistory.length > 0 && chatHistory.slice().reverse().map((chat, index) => (
-          <div key={chat._id || index} className="space-y-2">
-            {/* User Message */}
+          <div key={`db-${chat._id || index}`} className="space-y-2">
             <div className="flex justify-end">
               <div className="bg-blue-500 text-white rounded-lg p-3 max-w-xs">
                 <p className="text-sm">{chat.question}</p>
               </div>
             </div>
-
-            {/* Bot Response */}
             <div className="flex items-start gap-2">
               <span className="text-lg">🤖</span>
               <div className="bg-gray-50 rounded-lg p-3 max-w-xs">
@@ -170,6 +163,34 @@ Explain the crop health.`;
             </div>
           </div>
         ))}
+
+        {/* Local Session Messages (for guests or newly added) */}
+        {sessionMessages.map((chat, index) => (
+          <div key={`local-${index}`} className="space-y-2">
+            <div className="flex justify-end">
+              <div className="bg-blue-500 text-white rounded-lg p-3 max-w-xs">
+                <p className="text-sm">{chat.question}</p>
+              </div>
+            </div>
+            <div className="flex items-start gap-2">
+              <span className="text-lg">🤖</span>
+              <div className="bg-gray-50 rounded-lg p-3 max-w-xs">
+                <p className="text-sm text-gray-800">{chat.answer}</p>
+              </div>
+            </div>
+          </div>
+        ))}
+
+        {/* Optimistic User Message (While Waiting for Bot) */}
+        {optimisticUserMessage && (
+          <div className="space-y-2">
+            <div className="flex justify-end">
+              <div className="bg-blue-500 text-white rounded-lg p-3 max-w-xs">
+                <p className="text-sm">{optimisticUserMessage}</p>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Error Message */}
         {error && (
@@ -199,7 +220,7 @@ Explain the crop health.`;
       </div>
 
       {/* Quick Questions */}
-      {(!chatHistory || chatHistory.length === 0) && (
+      {((!chatHistory || chatHistory.length === 0) && sessionMessages.length === 0) && (
         <div className="p-4 border-t border-gray-200">
           <p className="text-xs text-gray-600 mb-2">Quick questions:</p>
           <div className="grid grid-cols-2 gap-2">

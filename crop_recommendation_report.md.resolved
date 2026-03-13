@@ -1,0 +1,105 @@
+# Krishi360 Crop Recommendation Report
+
+This report outlines all 19 crops currently available in the Krishi360 database, detailing their ideal growing conditions and identifying the specific scenarios or AI strategies where they are most likely to be recommended.
+
+## 🧠 How the Recommendation Engine Works
+Our **Crop Suitability Index (CSI)** dynamically scores each crop out of 100 based on the strategy you select. The algorithm evaluates 5 main pillars:
+1. **Soil Match**: Compares your farm's soil type and pH to the crop's ideal range.
+2. **Climate Match**: Evaluates your annual rainfall and average temperature against the crop's limits.
+3. **Market Price**: A normalized score rewarding higher-priced crops.
+4. **Disease Risk**: Penalizes crops that are highly susceptible to pests or diseases.
+5. **Water Efficiency**: Rewards crops with very low water requirements, especially if the farmer's region is water-scarce (< 800mm rainfall).
+
+Below is the breakdown of each crop and the exact conditions under which the engine will push them to the top of your list.
+
+---
+
+## 🌾 Cereals & Grains
+
+### 1. Wheat
+* **Ideal Match:** Loam, Clay-Loam, Silt-Loam (pH: 6.0-7.5), Rainfall: 450-650mm, Temp: 10-25°C
+* **Recommendation Case:** A strong contender for **Balanced** or **Low-Risk** strategies in cooler, drier climates (e.g., Punjab, Haryana, winters in MP/UP). It offers a stable price and relatively low disease risk.
+
+### 2. Pearl Millet (Bajra)
+* **Ideal Match:** Sandy, Sandy-Loam (pH: 5.5-8.0), Rainfall: 300-500mm, Temp: 25-35°C
+* **Recommendation Case:** The absolute top recommendation for **Water-Saving** strategies in extremely dry, hot, or arid regions (e.g., Rajasthan, parts of Gujarat). It has the lowest water requirement of all cereals.
+
+### 3. Sorghum (Jowar)
+* **Ideal Match:** Loam, Clay-Loam (pH: 5.5-8.5), Rainfall: 400-600mm, Temp: 20-35°C
+* **Recommendation Case:** Recommended strongly under **Water-Saving** and **Low-Risk** in semi-arid zones. It’s slightly more profitable than Pearl Millet and prefers better soil, making it a great middle-ground for dryland farming.
+
+### 4. Maize
+* **Ideal Match:** Loam, Clay-Loam, Sandy-Loam (pH: 6.0-7.0), Rainfall: 600-1200mm, Temp: 20-30°C
+* **Recommendation Case:** Often pushed by the **Balanced** strategy in moderate rainfall zones. It requires decent water and excellent soil but provides a very stable return.
+
+### 5. Rice
+* **Ideal Match:** Clay, Clay-Loam (pH: 5.5-7.0), Rainfall: 1000-2000mm, Temp: 20-35°C
+* **Recommendation Case:** Only recommended in extreme high-rainfall/heavy-clay zones (e.g., West Bengal, Kerala). The engine actively penalizes Rice heavily if the **Water-Saving** strategy is selected or if rainfall is low.
+
+---
+
+## 🌱 Pulses & Legumes
+
+### 6. Chickpea (Gram)
+* **Ideal Match:** Loam, Clay-Loam (pH: 6.0-8.0), Rainfall: 400-600mm, Temp: 15-30°C
+* **Recommendation Case:** Highly favored in **High-Profit** and **Market-Driven** strategies for cooler, drier regions due to its strong market price (₹5500/qtl). 
+
+### 7. Pigeon Pea (Tur/Arhar)
+* **Ideal Match:** Loam, Sandy-Loam (pH: 5.5-7.5), Rainfall: 600-1000mm, Temp: 20-35°C
+* **Recommendation Case:** Strongly recommended in **Sustainable** models due to nitrogen fixation, and **Market-Driven** models due to a very high price (₹6500/qtl). However, it requires a long growing period (150 days).
+
+### 8. Soybean
+* **Ideal Match:** Loam, Clay-Loam (pH: 6.0-7.5), Rainfall: 600-1000mm, Temp: 20-35°C
+* **Recommendation Case:** A fast grower (100 days) often pushed by **Balanced** strategies in central India (MP/Maharashtra). It's somewhat disease-prone, so it drops significantly if the **Low-Risk** strategy is active.
+
+---
+
+## 💰 Cash Crops & Commercial
+
+### 9. Cotton
+* **Ideal Match:** Black, Clay, Clay-Loam (pH: 5.5-8.0), Rainfall: 500-800mm, Temp: 20-35°C
+* **Recommendation Case:** The definition of high-risk, high-reward. It is practically the #1 option for **High-Profit** strategies in the Deccan plateau, but because its disease risk is extremely high (8/10), it instantly drops off the list if the user selects **Low-Risk**.
+
+### 10. Sugarcane
+* **Ideal Match:** Loam, Clay-Loam (pH: 6.5-7.5), Rainfall: 1000-2500mm, Temp: 20-35°C
+* **Recommendation Case:** Only recommended for farmers with massive water resources (1000mm+ rainfall) and very long-term plans (300 days). It's heavily penalized in **Water-Saving** profiles.
+
+### 11. Groundnut
+* **Ideal Match:** Sandy, Sandy-Loam, Loam (pH: 6.0-7.0), Rainfall: 500-1000mm, Temp: 20-30°C
+* **Recommendation Case:** Dominates the recommendations for sandy soil regions under **Balanced** and **High-Profit** strategies. It hits the perfect sweet spot of short duration (105 days) and high price (₹5800/qtl).
+
+### 12. Mustard
+* **Ideal Match:** Sandy-Loam, Loam (pH: 6.0-7.5), Rainfall: 400-600mm, Temp: 10-25°C
+* **Recommendation Case:** A superstar for **Low-Risk** and **Water-Saving** winter farming. It has very low disease risk (3/10) and low water needs while returning a great profit (₹5000/qtl).
+
+---
+
+## 🍅 Vegetables & Spices
+
+### 13. Onion
+* **Ideal Match:** Loam, Sandy-Loam (pH: 6.0-7.5), Rainfall: 600-1000mm, Temp: 15-25°C
+* **Recommendation Case:** Selected primarily in **Balanced** and **Low-Risk** profiles facing moderate, temperate conditions (like Nashik, Maharashtra). 
+
+### 14. Potato
+* **Ideal Match:** Loam, Sandy-Loam, Clay-Loam (pH: 5.5-6.5), Rainfall: 500-800mm, Temp: 15-20°C
+* **Recommendation Case:** Often recommended if the farmer wants a quick turnaround (only 90 days). However, it requires slightly acidic soil and cool weather, meaning it drops off quickly in hot, high-pH environments.
+
+### 15. Tomato
+* **Ideal Match:** Loam, Sandy-Loam (pH: 6.0-7.0), Rainfall: 600-1200mm, Temp: 20-30°C
+* **Recommendation Case:** Acts as a generic vegetable filler for moderate climates in the **Balanced** strategy. It's highly vulnerable to disease (7/10), so it is heavily down-ranked in **Low-Risk** modes.
+
+### 16. Chilli
+* **Ideal Match:** Loam, Clay-Loam (pH: 5.5-7.0), Rainfall: 600-1200mm, Temp: 20-30°C
+* **Recommendation Case:** An absolute powerhouse for the **High-Profit** strategy due to its massive return (₹8000/qtl). It is often recommended over tomatoes where profit maximization is the goal.
+
+### 17. Garlic
+* **Ideal Match:** Loam, Sandy-Loam (pH: 6.0-7.0), Rainfall: 500-700mm, Temp: 12-25°C
+* **Recommendation Case:** One of the most perfectly balanced high-tier crops. It commands an incredible price (₹6000/qtl) with very low disease risk (3/10) and low water use. It dominates **Low-Risk** and **Water-Saving** profiles in cooler climates.
+
+### 18. Turmeric
+* **Ideal Match:** Loam, Clay-Loam (pH: 5.5-7.5), Rainfall: 1000-2000mm, Temp: 20-35°C
+* **Recommendation Case:** Requires long-term commitment (250 days) and high rainfall. It will almost always be suggested in **Sustainable** or **Low-Risk** strategies for tropical, wet regions (e.g., Kerala, Tamil Nadu).
+
+### 19. Ginger
+* **Ideal Match:** Loam, Sandy-Loam (pH: 6.0-7.0), Rainfall: 1500-2500mm, Temp: 20-30°C
+* **Recommendation Case:** The ultimate **Market-Driven** and **High-Profit** winner for extremely wet, humid areas. Standing at an incredible ₹8500/qtl, it crushes all other crops in profitability but demands nearly identical massive rainfall as Sugarcane.

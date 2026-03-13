@@ -30,6 +30,7 @@ const applicationTables = {
       temperature: v.object({ min: v.number(), max: v.number() }),
     }),
     marketPrice: v.number(), // per quintal
+    priceLastUpdated: v.optional(v.number()), // timestamp of last price fetch
     diseaseRisk: v.number(), // 1-10 scale
     growthDays: v.number(),
     baseTemperature: v.number(), // for GDD calculation

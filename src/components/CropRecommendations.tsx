@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useMutation, useQuery } from "convex/react";
+import { useMutation, useQuery, useAction } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import { toast } from "sonner";
 import { ChevronDown } from "lucide-react";
@@ -11,6 +11,8 @@ export function CropRecommendations() {
   const recommendations = useQuery(api.recommendations.getLatestRecommendations);
   const seedCrops = useMutation(api.crops.seedCrops);
   const forceSeedCrops = useMutation(api.crops.forceSeedCrops);
+  const fetchLivePrices = useAction(api.prices.fetchLivePrices);
+  const priceRefreshStatus = useQuery(api.prices.getPriceRefreshStatus);
 
   const strategies = [
     { id: "Balanced", name: "Balanced (Default)", description: "Moderate profit, moderate risk" },
@@ -51,6 +53,17 @@ export function CropRecommendations() {
     }
   };
 
+  const handleRefreshPrices = async () => {
+    try {
+      toast.info("Updating market prices...");
+      await fetchLivePrices();
+      toast.success("Prices updated successfully!");
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to update prices.");
+    }
+  };
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -65,10 +78,21 @@ export function CropRecommendations() {
               >
                 Reset Database
               </button>
+              <button
+                onClick={handleRefreshPrices}
+                className="text-xs bg-blue-100 hover:bg-blue-200 text-blue-700 px-2 py-1 rounded"
+              >
+                Refresh Prices
+              </button>
             </div>
             <p className="text-gray-600">
               Get personalized crop suggestions based on your soil, climate, and market conditions
             </p>
+            {priceRefreshStatus?.lastUpdated && (
+              <p className="text-xs text-green-600 font-medium mt-1">
+                Market Prices: Live (Last updated: {new Date(priceRefreshStatus.lastUpdated).toLocaleString()})
+              </p>
+            )}
           </div>
 
           <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center">

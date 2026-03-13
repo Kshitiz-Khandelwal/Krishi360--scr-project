@@ -1,0 +1,12 @@
+import { cronJobs } from "convex/server";
+import { api } from "./_generated/api";
+
+const crons = cronJobs();
+
+crons.daily(
+  "fetch live market prices",
+  { hourUTC: 0, minuteUTC: 0 },
+  api.prices.fetchLivePrices,
+);
+
+export default crons;

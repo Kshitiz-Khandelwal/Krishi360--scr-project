@@ -194,16 +194,16 @@ const ToggleClose = ({ open, setOpen }: { open: boolean, setOpen: (open: boolean
       <div className="flex items-center p-3">
         <div className="grid size-10 place-content-center">
           <ChevronsRight
-            className={`h-4 w-4 transition-transform duration-300 text-gray-500 dark:text-gray-400 ${open ? "rotate-180" : ""
+            className={`h-5 w-5 transition-transform duration-300 text-gray-800 dark:text-gray-200 ${open ? "rotate-180" : ""
               }`}
           />
         </div>
         {open && (
           <span
-            className={`text-sm font-medium text-gray-600 dark:text-gray-300 transition-opacity duration-200 ${open ? 'opacity-100' : 'opacity-0'
+            className={`text-sm font-semibold text-gray-800 dark:text-gray-200 transition-opacity duration-200 ${open ? 'opacity-100' : 'opacity-0'
               }`}
           >
-            Hide
+            Collapse Sidebar
           </span>
         )}
       </div>

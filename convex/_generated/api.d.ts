@@ -15,10 +15,12 @@ import type {
 } from "convex/server";
 import type * as auth from "../auth.js";
 import type * as chatbot from "../chatbot.js";
+import type * as crons from "../crons.js";
 import type * as crops from "../crops.js";
 import type * as farmers from "../farmers.js";
 import type * as http from "../http.js";
 import type * as pastCrops from "../pastCrops.js";
+import type * as prices from "../prices.js";
 import type * as recommendations from "../recommendations.js";
 import type * as router from "../router.js";
 import type * as weather from "../weather.js";
@@ -34,10 +36,12 @@ import type * as weather from "../weather.js";
 declare const fullApi: ApiFromModules<{
   auth: typeof auth;
   chatbot: typeof chatbot;
+  crons: typeof crons;
   crops: typeof crops;
   farmers: typeof farmers;
   http: typeof http;
   pastCrops: typeof pastCrops;
+  prices: typeof prices;
   recommendations: typeof recommendations;
   router: typeof router;
   weather: typeof weather;
